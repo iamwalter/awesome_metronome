@@ -1,35 +1,13 @@
-
 import 'package:awesome_metronome/infra/sound_service_contract.dart';
 import 'package:just_audio/just_audio.dart';
 
 class SoundServiceJustAudio implements SoundServiceContract {
-  late final players = [
-    AudioPlayer(userAgent: '1'),
-    AudioPlayer(userAgent: '2'),
-    AudioPlayer(userAgent: '3'),
-    AudioPlayer(userAgent: '4'),
-    AudioPlayer(userAgent: '5'),
-    AudioPlayer(userAgent: '6'),
-    AudioPlayer(userAgent: '7'),
-    AudioPlayer(userAgent: '8'),
-    AudioPlayer(userAgent: '9'),
-    AudioPlayer(userAgent: '10'),
-    AudioPlayer(userAgent: '11'),
-    AudioPlayer(userAgent: '12'),
-    AudioPlayer(userAgent: '13'),
-    AudioPlayer(userAgent: '14'),
-    AudioPlayer(userAgent: '15'),
-    AudioPlayer(userAgent: '16'),
-    AudioPlayer(userAgent: '17'),
-    AudioPlayer(userAgent: '18'),
-    AudioPlayer(userAgent: '19'),
-    AudioPlayer(userAgent: '20'),
-  ];
+  final players = [];
+
+  late var cachedNewPlayer = AudioPlayer();
 
   SoundServiceJustAudio._() {
-    for (final player in players) {
-      player.setAsset("assets/sounds/tik.mp3");
-    }
+    _initNewPlayer();
   }
 
   static SoundServiceJustAudio? _instance;
@@ -40,15 +18,15 @@ class SoundServiceJustAudio implements SoundServiceContract {
     return _instance!;
   }
 
-  @override
-  void playTick() {
-    final firstNotPlaying =
-        players.where((element) => !element.playing).firstOrNull;
+  AudioPlayer _initNewPlayer() {
 
-    if (firstNotPlaying == null) return;
+    players.add(cachedNewPlayer);
 
+    final player = AudioPlayer();
+    player.setAsset("assets/sounds/tik.mp3");
+    cachedNewPlayer = player;
 
-    playStopSeek(firstNotPlaying);
+    return cachedNewPlayer;
   }
 
   Future<void> playStopSeek(AudioPlayer player) async {
@@ -58,7 +36,18 @@ class SoundServiceJustAudio implements SoundServiceContract {
   }
 
   @override
+  void playTick() async {
+    var firstNotPlaying =
+        players.where((element) => !element.playing).firstOrNull;
+
+    firstNotPlaying ??= _initNewPlayer();
+
+    playStopSeek(firstNotPlaying);
+  }
+
+  @override
   bool isPlaying() {
-    return players.where((element) => element.playing).firstOrNull != null;
+    return players.firstWhere((audioPlayer) => audioPlayer.playing).firstOrNull !=
+        null;
   }
 }

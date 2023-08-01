@@ -1,5 +1,4 @@
-import 'package:awesome_metronome/data/metrome_controller.dart';
-import 'package:awesome_metronome/infra/sound_service_contract.dart';
+import 'package:awesome_metronome/data/metronome_controller.dart';
 import 'package:flutter/material.dart';
 
 import 'infra/sound_service.dart';
@@ -34,8 +33,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final controller = MetronomeController.instance(
+  final controller = MetronomeController(
     soundService: SoundServiceJustAudio.instance,
+    bpm: 80,
     onTick: () => print("Tick!"),
   );
 
@@ -47,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
 
     bpm = controller.bpm;
-    isRunning = controller.isRunning;
+    isRunning = controller.running;
   }
 
   @override
@@ -69,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
               value: bpm.toDouble(),
               onChanged: (val) => setState(() {
                 bpm = val.toInt();
-                controller.setBpm(bpm);
+                controller.bpm = bpm;
               }),
               min: 40,
               max: 200,
@@ -80,13 +80,13 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           setState(() {
-            if (!controller.isRunning) {
+            if (!controller.running) {
               controller.start();
             } else {
               controller.stop();
             }
 
-            isRunning = controller.isRunning;
+            isRunning = controller.running;
           });
         },
         tooltip: 'Play/Pause',
