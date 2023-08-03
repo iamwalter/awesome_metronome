@@ -2,8 +2,25 @@ import 'package:awesome_metronome/blocs/home_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  final backgroundColors = [
+    Colors.orange,
+    Colors.blue,
+    Colors.amber,
+    Colors.teal,
+    Colors.red,
+    Colors.green,
+    Colors.purple,
+  ];
+
+  var currentBgColorIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -13,15 +30,18 @@ class MyHomePage extends StatelessWidget {
       bloc: cubit,
       buildWhen: (oldState, newState) => newState is Data,
       listener: (context, state) {
-        if (state is Data) {
-          print("data!");
+        if (state is OnTickEvent) {
+          setState(() {
+            currentBgColorIndex =
+                (currentBgColorIndex + 1) % backgroundColors.length;
+          });
         }
       },
       builder: (context, state) {
         return switch (state) {
           Data data => Scaffold(
               appBar: AppBar(
-                backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                backgroundColor: backgroundColors[currentBgColorIndex],
                 title: const Text('Awesome Metronome'),
               ),
               body: Center(
@@ -36,7 +56,7 @@ class MyHomePage extends StatelessWidget {
                       value: data.bpm.toDouble(),
                       onChanged: (val) => cubit.setBpm(val),
                       min: 40,
-                      max: 200,
+                      max: 500,
                     )
                   ],
                 ),
@@ -48,7 +68,6 @@ class MyHomePage extends StatelessWidget {
                   } else {
                     cubit.play();
                   }
-
                 },
                 tooltip: 'Play/Pause',
                 child: Icon(!data.isPlaying ? Icons.play_arrow : Icons.pause),
