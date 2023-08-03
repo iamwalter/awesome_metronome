@@ -4,7 +4,7 @@ import 'package:just_audio/just_audio.dart';
 class SoundServiceJustAudio implements SoundServiceContract {
   final players = [];
 
-  late var cachedNewPlayer = AudioPlayer();
+  var cachedNewPlayer = AudioPlayer();
 
   SoundServiceJustAudio._() {
     _initNewPlayer();
