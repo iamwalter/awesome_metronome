@@ -12,41 +12,29 @@ class SoundServiceJustAudio implements SoundServiceContract {
     return _instance!;
   }
 
-  // final players = <AudioPlayer>[
-  //   AudioPlayer(),
-  //   AudioPlayer(),
-  //   AudioPlayer(),
-  //   AudioPlayer(),
-  //   AudioPlayer(),
-  //   AudioPlayer(),
-  //   AudioPlayer(),
-  //   AudioPlayer(),
-  //   AudioPlayer(),
-  //   AudioPlayer(),
-  //   AudioPlayer(),
-  //   AudioPlayer(),
-  //   AudioPlayer(),
-  //   AudioPlayer(),
-  //   AudioPlayer(),
-  //   AudioPlayer(),
-  //   AudioPlayer(),
-  // ];
+  final players = List<AudioPlayer>.generate(
+    3 * 4,
+    (i) => AudioPlayer(userAgent: "audioplayer - $i"),
+  );
 
-  final players = List<AudioPlayer>.generate(50, (i) => AudioPlayer(userAgent: "audioplayer-$i"));
-
-  int nextAudioPlayerIndex = 0;
+  int audioPlayerIndex = 0;
 
   SoundServiceJustAudio._() {
-    for (final player in players) {
+    for (int i = 0; i < players.length; i++) {
+      final player = players[i];
+
+      if (i % 4 == 0) {
+        player.setVolume(3.6);
+        player.setPitch(0.4);
+      }
+
       player.setAsset("assets/sounds/tik.mp3");
     }
   }
 
   Future<void> playStopSeek(AudioPlayer player) async {
     if (player.playing) {
-      print("Need more players!");
-
-
+      print("Need more players, $player .");
 
       return;
     }
@@ -58,19 +46,11 @@ class SoundServiceJustAudio implements SoundServiceContract {
 
   @override
   void playTick() async {
-    final audioPlayer = players[nextAudioPlayerIndex];
+    final audioPlayer = players[audioPlayerIndex];
 
     unawaited(playStopSeek(audioPlayer));
 
-    nextAudioPlayerIndex = (nextAudioPlayerIndex + 1) % players.length;
+    audioPlayerIndex = (audioPlayerIndex + 1) % players.length;
   }
 
-  @override
-  bool isPlaying() {
-    for (final player in players) {
-      if (player.playing) return true;
-    }
-
-    return false;
-  }
 }
