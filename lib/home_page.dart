@@ -63,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               floatingActionButton: FloatingActionButton(
                 onPressed: () {
-                  if (cubit.running) {
+                  if (data.isPlaying) {
                     cubit.stop();
                   } else {
                     cubit.play();
